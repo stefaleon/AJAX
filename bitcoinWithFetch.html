@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Current Bitcoin Price</title>
+    <style>
+      img {
+        height: 200px;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: Tahoma;
+      }
+      button {
+        margin: 20px;
+        cursor:pointer;
+        border-radius: 3px;
+        padding: 5px;
+        outline: none;
+      }
+      #disclaimer {
+        font-size: .8em;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+      <div id="time"></div>
+      <h3>Current Bitcoin Price</h3>
+      <div id="fetchTime"></div>
+      <p id="bitcoindata"></p>
+      <button id="btn">Get Current Bitcoin Price</button>
+      <p id="disclaimer"></p>
+    </div>
+
+
+  <script>
+
+  var btn = document.querySelector("#btn");
+  var bitcoinData = document.querySelector("#bitcoindata");
+  var disclaimerText = document.querySelector("#disclaimer");
+
+  startTime(); // live clock on top
+
+  btn.addEventListener("click", () => {
+
+        var url = "https://api.coindesk.com/v1/bpi/currentprice.json";
+
+        fetch(url).then(function(res){
+          console.log("res is:", res);
+          //console.log("res(json) is a promise:", res.json());
+          return res.json();
+        }).then(function(data){
+          console.log("Parsed data is an object:", data);
+          bitcoinData.innerHTML = data.bpi.USD.symbol + ' ' + data.bpi.USD.rate
+          + '<p>' + data.bpi.GBP.symbol + ' ' + data.bpi.GBP.rate + '</p>'
+          + '<p>' + data.bpi.EUR.symbol + ' ' + data.bpi.EUR.rate + '</p>';
+          disclaimerText.innerHTML = data.disclaimer;
+          currentTime();
+        }).catch(function(error){
+          console.log("Error!", error);
+        });       
+
+
+  });
+
+
+    function currentTime() {
+      var today = new Date();
+      var h = today.getHours();
+      var m = today.getMinutes();
+      var s = today.getSeconds();
+      m = checkTime(m);
+      s = checkTime(s);
+      document.getElementById('fetchTime').innerHTML = "@ " + h + ":" + m + ":" + s;
+    }
+
+    function checkTime(i) {
+      if (i < 10) {
+        i = "0" + i;
+      }
+      return i;
+    }
+
+    function startTime() {
+      var today = new Date();
+      var h = today.getHours();
+      var m = today.getMinutes();
+      var s = today.getSeconds();
+      // add a zero in front of numbers<10
+      m = checkTime(m);
+      s = checkTime(s);
+      document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+      t = setTimeout(function() {
+        startTime()
+      }, 500);
+    }
+
+
+
+
+  </script>
+
+  </body>
+</html>
